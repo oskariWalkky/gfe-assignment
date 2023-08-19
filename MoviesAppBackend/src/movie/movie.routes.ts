@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/movies', (req: Request, res: Response) => {
     try {
-        const filePath = path.join(__dirname, '.', 'assets', 'movies-compact.json');
+        const filePath = path.join(__dirname, '..', 'assets', 'movies-compact.json');
         const movies = fs.readFileSync(filePath, 'utf-8');
         res.send(movies);
     } catch (error) {
