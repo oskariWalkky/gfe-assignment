@@ -1,0 +1,20 @@
+<div class="action-container">
+    <mat-form-field>
+        <mat-label>Title search</mat-label>
+        <input #search
+            matInput
+            type="text"
+            (keyup)="titleSearch$.next(search.value)">
+    </mat-form-field>
+    <button mat-raised-button
+        color="primary"
+        (click)="addNewMovie()">
+        Add new movie
+    </button>
+</div>
+<div class="movie-container">
+    <ng-container *ngFor="let movie of movies$ | async">
+        <app-movie-card [movie]="movie"
+            (onSaveMovie)="saveMovie($event)"></app-movie-card>
+    </ng-container>
+</div>
