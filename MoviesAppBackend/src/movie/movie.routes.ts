@@ -17,7 +17,7 @@ router.get('/', async (req: Request, res: Response) => {
 });
 
 router.get('/:id', async (req: Request, res: Response) => {
-    const id = req?.params?.id;
+    const id = req.params?.id;
     try {
         const query = { _id: new ObjectId(id) };
         const movie = await collections.movies!.findOne(query);
@@ -27,6 +27,20 @@ router.get('/:id', async (req: Request, res: Response) => {
     } catch (error) {
         logError(error);
         res.status(404).send(`Unable to find matching document with id: ${id}`);
+    }
+});
+
+router.get('/title/:title', async (req: Request, res: Response) => {
+    const searchTerm = req.params?.title;
+    try {
+        const query = { name: { $regex: new RegExp(searchTerm, 'i') } };
+        const movies = await collections.movies!.find(query).toArray();
+        if (movies) {
+            res.status(200).send(movies);
+        }
+    } catch (error) {
+        logError(error);
+        res.status(404).send(`Unable to find matching document with id: ${searchTerm}`);
     }
 });
 
@@ -45,9 +59,10 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.put("/:id", async (req: Request, res: Response) => {
-    const id = req?.params?.id;
     try {
+        const id = req.params.id;
         const updatedMovie = req.body as Movie;
+        delete updatedMovie._id
         const query = { _id: new ObjectId(id) };
 
         const result = await collections.movies!.updateOne(query, { $set: updatedMovie });

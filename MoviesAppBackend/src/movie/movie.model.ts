@@ -11,6 +11,6 @@ export default class Movie {
         public actors: Person[],
         public director: Person,
         public synopsis: string,
-        public id?: ObjectId
+        public _id?: ObjectId
     ) { }
 }
