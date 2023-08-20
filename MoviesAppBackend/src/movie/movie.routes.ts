@@ -1,14 +1,63 @@
 import express, { Request, Response } from 'express';
-import movies from '../assets/movies-compact.json'
+import { collections } from '../services/database.service';
+import Movie from './movie.model';
+import { ObjectId } from 'mongodb';
+import { logError } from '../services/logging.service';
 
 const router = express.Router();
 
-router.get('/movies', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
     try {
+        const movies = await collections.movies!.find({}).toArray();
         res.send(movies);
     } catch (error) {
-        console.error(error);
-        res.status(500).send();
+        logError(error);
+        res.status(500).send((error as any)?.message ?? error);
+    }
+});
+
+router.get('/:id', async (req: Request, res: Response) => {
+    const id = req?.params?.id;
+    try {
+        const query = { _id: new ObjectId(id) };
+        const movie = await collections.movies!.findOne(query);
+        if (movie) {
+            res.status(200).send(movie);
+        }
+    } catch (error) {
+        logError(error);
+        res.status(404).send(`Unable to find matching document with id: ${id}`);
+    }
+});
+
+router.post("/", async (req: Request, res: Response) => {
+    try {
+        const newMovie = req.body as Movie;
+        const result = await collections.movies!.insertOne(newMovie);
+
+        result
+            ? res.status(201).send(`Successfully created a new movie with id ${result.insertedId}`)
+            : res.status(500).send("Failed to create a new movie.");
+    } catch (error) {
+        logError(error, 'Post-New-Movie');
+        res.status(400).send((error as any)?.message ?? error);
+    }
+});
+
+router.put("/:id", async (req: Request, res: Response) => {
+    const id = req?.params?.id;
+    try {
+        const updatedMovie = req.body as Movie;
+        const query = { _id: new ObjectId(id) };
+
+        const result = await collections.movies!.updateOne(query, { $set: updatedMovie });
+
+        result
+            ? res.status(200).send(`Successfully updated game with id ${id}`)
+            : res.status(304).send(`Game with id: ${id} not updated`);
+    } catch (error) {
+        logError(error);
+        res.status(400).send((error as any)?.message ?? error);
     }
 });
 

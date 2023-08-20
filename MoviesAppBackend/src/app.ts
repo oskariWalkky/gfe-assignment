@@ -4,7 +4,8 @@ import movieRoute from './movie/movie.routes';
 
 const app: Express = express();
 
-app.use('/', movieRoute)
+app.use(express.json())
+app.use('/movies', movieRoute)
 
 app.get('/', (req: Request, res: Response) => {
   res.send({message: 'Express + TypeScript Movie App Server'});

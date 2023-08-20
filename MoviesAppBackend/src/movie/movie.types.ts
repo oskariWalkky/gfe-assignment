@@ -1,25 +1,18 @@
-export interface MovieWithoutId {
+import { ObjectId } from "mongodb";
+
+export interface IMovie {
     name: string;
     year: number;
     genres: string[];
     ageLimit: number;
     rating: number;
-    actors: Actor[];
-    director: Director;
+    actors: Person[];
+    director: Person;
     synopsis: string;
+    id?: ObjectId;
 }
 
-export interface MovieWithId extends MovieWithoutId {
-    id: string;
-}
-
-export interface Actor {
+export interface Person {
     firstName: string;
     lastName: string;
 }
-
-export interface Director {
-    firstName: string;
-    lastName: string;
-}
-
